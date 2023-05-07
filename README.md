@@ -1,6 +1,6 @@
 # pvf-openAI Assistent
 
-This is a Python-Qt based application that uses the GPT-xxx model to create a helpful assistant that can answer any question you ask.
+This is a Python-Qt based application that uses the GPT-xxx model to create a helpful assistant based on opeAI GPTs that can answer any question you ask.
 
 This is a simple demo of using openAI API to simulate chatGPT.
 
@@ -20,9 +20,9 @@ Install the required packages via pip:
 pip install PyQt5 openai
 ```
 
-## UI Setup
+## UI Setup (and updates)
 
-The user interface is built using Qt Designer which creates an `assistent.ui` file. This file needs to be translated into Python code using the following command:
+The user interface is built using Qt Designer which creates an *.ui files (e.g.`assistent.ui`). This file needs to be translated into Python code using the following command:
 
 ```
 pyuic5 assistent.ui -o assistent.py
