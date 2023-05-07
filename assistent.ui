@@ -43,7 +43,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QTextEdit" name="test_user">
+       <widget class="QTextEdit" name="text_user">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
           <horstretch>0</horstretch>
@@ -71,7 +71,7 @@
        </widget>
       </item>
       <item alignment="Qt::AlignRight">
-       <widget class="QCommandLinkButton" name="button_submit">
+       <widget class="QCommandLinkButton" name="button_abort">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -94,7 +94,7 @@
          <string>Press to submit</string>
         </property>
         <property name="text">
-         <string>Submit</string>
+         <string>Abort</string>
         </property>
        </widget>
       </item>
@@ -161,8 +161,8 @@ p, li { white-space: pre-wrap; }
   </widget>
  </widget>
  <tabstops>
-  <tabstop>test_user</tabstop>
-  <tabstop>button_submit</tabstop>
+  <tabstop>text_user</tabstop>
+  <tabstop>button_abort</tabstop>
   <tabstop>text_message</tabstop>
  </tabstops>
  <resources/>

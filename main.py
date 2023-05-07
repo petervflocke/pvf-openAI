@@ -1,9 +1,8 @@
 from time import sleep
 import logging
 import openai
-from PyQt5.QtCore import QThread, pyqtSignal
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QSizePolicy, QPushButton, QSizeGrip, QMainWindow
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import QThread, pyqtSignal, QEvent, Qt
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QSizePolicy, QPushButton, QSizeGrip, QMainWindow, QTextEdit
 
 #from text_ui import Ui_MainWindow
 from assistent import Ui_MainWindow
@@ -13,11 +12,12 @@ MODEL = "gpt-4"
 
 # openAI SYSTEM
 SYSTEM = """
-You are Peter, a helpful assistent
+Your name is Peter, you are helpful assistent
 """
 
 class openAIBackgroundTask(QThread):
     progress = pyqtSignal(str)
+    finished = pyqtSignal()
 
     def __init__(self, openai_arg, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -27,10 +27,14 @@ class openAIBackgroundTask(QThread):
         for chunk in openai.ChatCompletion.create(
             **self.openai_arg
         ):
+            if self.isInterruptionRequested():
+                break
             content = chunk["choices"][0].get("delta", {}).get("content")
             if content is not None:
                 self.progress.emit(content)
         self.progress.emit("\n")
+        self.finished.emit()
+
 
 
 class MainWindow(QMainWindow):    
@@ -41,7 +45,7 @@ class MainWindow(QMainWindow):
         
         #check if the MainWinow class works ;)
         self.ui.prompt.setText("Ask me anything")
-        self.ui.test_user.setPlaceholderText('Your prompt goes here:')
+        self.ui.text_user.setPlaceholderText('Your prompt goes here:')
         
         #remove windows titel and frame to imitate modern UIX
         self.setWindowFlag(Qt.FramelessWindowHint)
@@ -52,34 +56,59 @@ class MainWindow(QMainWindow):
         layout.addWidget(sizegrip, 0, Qt.AlignBottom | Qt.AlignRight)
 
         #connect button(s) to method(s)
-        self.ui.button_submit.clicked.connect(self.submit_action)
+        self.ui.button_abort.clicked.connect(self.submit_abort)
 
         # self.close_button = QPushButton('Close', self)
         # self.close_button.clicked.connect(self.close_application)
         # layout.addWidget(self.close_button)
 
-    def mousePressEvent(self, event):
-        self.offset = event.pos()
+        # add enter and ctr+enter handler for text_user field
+        self.ui.text_user.installEventFilter(self)
 
+    # handle titelless window movement
     def mouseMoveEvent(self, event):
         newPos = event.globalPos() - self.offset
         self.move(newPos)
+
+    def mousePressEvent(self, event):
+        self.offset = event.pos()
 
     # add fake window decoretor to close window?
     def close_application(self):
         self.close()
 
+    # handler for incoming stream from openAI add at the end of the current text
     def update_text_message(self, message):
         cursor = self.ui.text_message.textCursor()
         cursor.insertText(message)
 
+    # stream from openAI has been finished reanable input field
+    def done_text_message(self):
+        self.ui.text_user.clear()
+        self.ui.text_user.setEnabled(True)
+        self.ui.text_user.setFocus()
+
+    # handler for "enter" key (submit request) and ctr+enter add new line in the input field
+    def eventFilter(self, obj, event):
+        if event.type() == QEvent.KeyPress and obj is self.ui.text_user:
+            if event.key() == Qt.Key_Return and self.ui.text_user.hasFocus():
+                if QApplication.keyboardModifiers() == Qt.ControlModifier:
+                    cursor = self.ui.text_user.textCursor()
+                    cursor.insertText("\n")
+                else:
+                    # enter pressed detected submit request to openAI
+                    self.submit_action() 
+        return super().eventFilter(obj, event)
+
+    # handling the openAI parameters before request submit and disable input to avoid paralel request
     def submit_action(self):
+        self.ui.text_user.setEnabled(False)
         openai_arg = {
             'model': MODEL,
             'messages': [
                 {"role": "system", "content": SYSTEM},
                 {"role": "assistant", "content": self.ui.text_message.toPlainText()},
-                {"role": "user", "content": self.ui.test_user.toPlainText()},
+                {"role": "user", "content": self.ui.text_user.toPlainText()},
             ],
             # 'temperature': ,
             # 'max_tokens': ,
@@ -89,15 +118,19 @@ class MainWindow(QMainWindow):
             'stream': True,
         }
 
-        self.ui.text_message.append(self.ui.test_user.toPlainText() + "\n\n")
+        self.ui.text_message.append(self.ui.text_user.toPlainText() + "\n\n")
 
         self.background_task = openAIBackgroundTask(openai_arg)
         self.background_task.progress.connect(self.update_text_message)
+        self.background_task.finished.connect(self.done_text_message)
         self.background_task.start()
 
-        # create a python loop printing from 1 to 10
-        self.ui.test_user.clear()
-
+    # handler for aborting runing worker with for incoming message from openAI
+    def submit_abort(self):
+        self.background_task.requestInterruption()
+        self.ui.text_user.clear()
+        self.ui.text_user.setEnabled(True)
+        self.ui.text_user.setFocus()
 
 if __name__ == "__main__":
     import sys
