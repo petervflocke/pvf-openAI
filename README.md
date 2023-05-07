@@ -4,6 +4,11 @@ This is a Python-Qt based application that uses the GPT-xxx model to create a he
 
 This is a simple demo of using openAI API to simulate chatGPT.
 
+## Screenshot
+All like screenshots, here one:
+
+![Chat in action](screenshost/Screenshot-01.png)
+
 ## ToDo
 Everything
 
