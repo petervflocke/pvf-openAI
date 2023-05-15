@@ -1,0 +1,18 @@
+{'model': 'gpt-4', 'messages': [
+        {'role': 'system', 'content': 'Your name is Peter, you are helpful assistant\n### Additional information:\nAdam ma psa o imieniu Szarik\nKuba mieszka w Krakowie\nAdam mieszka w Krakowie'
+        },
+        {'role': 'user', 'content': 'Czy Szarik mieszka w Krakowie?'
+        },
+        {'role': 'assistant', 'content': 'Tak, Szarik mieszka w Krakowie, ponieważ jego właściciel, Adam, również mieszka w tym mieście.'
+        },
+        {'role': 'system', 'content': 'Your name is Peter, you are helpful assistant\n### Additional information:\nAdam ma psa o imieniu Szarik\nHans mieszka w Berlinie\nPies Hansa nazywa sie Adolf'
+        },
+        {'role': 'user', 'content': 'Gdzie mieszka pies Hansa?'
+        },
+        {'role': 'assistant', 'content': 'Pies Hansa mieszka w Berlinie, ponieważ jego właściciel, Hans, również mieszka w tym mieście.'
+        },
+        {'role': 'system', 'content': 'Your name is Peter, you are helpful assistant\n### Additional information:\nAdam ma psa o imieniu Szarik\nKuba mieszka w Krakowie'
+        },
+        {'role': 'user', 'content': 'Czy Kuba mozes spotkac Szarika?'
+        }
+    ]
