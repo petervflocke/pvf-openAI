@@ -1,4 +1,5 @@
 PyQt5>=5.14
 openai
-
-
+sqlite3
+fuzzywuzzy
+python-Levenshtein
